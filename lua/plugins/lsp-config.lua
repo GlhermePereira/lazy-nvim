@@ -13,48 +13,87 @@ return {
       auto_install = true,
     },
   },
+
   {
     "neovim/nvim-lspconfig",
     lazy = false,
     config = function()
-      local capabilities = require('cmp_nvim_lsp').default_capabilities()
+    local capabilities = require('cmp_nvim_lsp').default_capabilities()
+    local lspconfig = require("lspconfig")
 
-      local lspconfig = require("lspconfig")
-      -- LSPs configurados
-      lspconfig.ts_ls.setup({ capabilities = capabilities })    -- JavaScript/TypeScript
-      lspconfig.html.setup({ capabilities = capabilities })        -- HTML
-      lspconfig.cssmodules_ls.setup({ capabilities = capabilities }) -- CSS
-      lspconfig.lua_ls.setup({ capabilities = capabilities })      -- Lua
-      -- Python
-local lspconfig = require("lspconfig")
+    -- Configuração do LSP para TypeScript e JavaScript
+    lspconfig.ts_ls.setup({
+      capabilities = capabilities,
+      filetypes = { 'typescript', 'javascript' },
+      root_dir = lspconfig.util.root_pattern('package.json', '.git'),
+    })
 
-lspconfig.pyright.setup({
-  capabilities = require('cmp_nvim_lsp').default_capabilities(),
-  root_dir = require("lspconfig.util").root_pattern(
-    "pyproject.toml",
-    "setup.py",
-    "setup.cfg",
-    "requirements.txt",
-    ".git"
-  ),
-  settings = {
-    python = {
-      analysis = {
-        diagnosticMode = "workspace",
-        autoSearchPaths = true,
-        useLibraryCodeForTypes = true,
-        stubPath = "typings",
-        typeCheckingMode = "basic",
-        logLevel = "Information",
+    -- Configuração do LSP para HTML e Django
+    lspconfig.html.setup({
+      capabilities = capabilities,
+      filetypes = { 'html', 'htmldjango' },
+    })
+
+    -- Configuração do LSP para CSS
+    lspconfig.cssmodules_ls.setup({
+      capabilities = capabilities,
+      filetypes = { 'css' },
+      root_dir = lspconfig.util.root_pattern('package.json', '.git'),
+    })
+
+    -- Configuração do LSP para Lua
+    lspconfig.lua_ls.setup({
+      capabilities = capabilities,
+    })
+
+    -- Configuração do LSP para Python
+    lspconfig.pyright.setup({
+      capabilities = capabilities,
+      root_dir = require("lspconfig.util").root_pattern(
+        "pyproject.toml",
+        "setup.py",
+        "setup.cfg",
+        "requirements.txt",
+        ".git"
+      ),
+      settings = {
+        python = {
+          analysis = {
+            diagnosticMode = "workspace",
+            autoSearchPaths = true,
+            useLibraryCodeForTypes = true,
+            stubPath = "typings",
+            typeCheckingMode = "basic",
+            logLevel = "Information",
+          },
+        },
       },
-    },
-  },
-})
+    })
 
+    -- Configuração do LSP para Bash
+    lspconfig.bashls.setup({
+      capabilities = capabilities,
+      filetypes = { 'bash', 'sh' },
+      root_dir = lspconfig.util.root_pattern('.git', '*.bashrc', '*.bash_profile'),
+    })
 
-      lspconfig.jdtls.setup({ capabilities = capabilities })       -- Java
-      lspconfig.clangd.setup({ capabilities = capabilities })      -- C/C++
-      lspconfig.intelephense.setup({ capabilities = capabilities })-- PHP (Intelephense)
+    -- Configuração do LSP para PHP (Stimulus)
+    lspconfig.stimulus_ls.setup({
+      cmd = { "stimulus-language-server", "--stdio" },
+      filetypes = { "php", "blade" },
+      root_dir = require("lspconfig.util").root_pattern("composer.json", "git"),
+    })
+
+    -- Configuração do LSP para Java
+    lspconfig.jdtls.setup({
+      capabilities = capabilities,
+    })
+
+    -- Configuração do LSP para C/C++
+    lspconfig.clangd.setup({
+      capabilities = capabilities,
+    })
+      -- Adicionando Blade LSP
 
       -- Atalhos para LSP
       vim.keymap.set("n", "K", vim.lsp.buf.hover, {})
@@ -64,4 +103,3 @@ lspconfig.pyright.setup({
     end,
   },
 }
-
